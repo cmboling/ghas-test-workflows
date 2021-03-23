@@ -54,7 +54,7 @@ steps:
 
       & $(InstallDirectory)\codeql\codeql database analyze $(System.DefaultWorkingDirectory)\codeql-database $(System.DefaultWorkingDirectory)\codeql\qlpacks\codeql-csharp\codeql-suites\csharp-code-scanning.qls --format=sarif-latest --output=$(System.DefaultWorkingDirectory)\codeql-sarif\code-scanning-alerts.sarif
       
- - task: PowerShell@2
+- task: PowerShell@2
   displayName: Upload CodeQL Results
   inputs:
     targetType: inline
