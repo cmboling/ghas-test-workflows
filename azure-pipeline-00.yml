@@ -1,0 +1,74 @@
+trigger:
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - '*'
+
+schedules:
+- cron: "0 14 * * *" # 00:00 AEST is 14:00 UTC
+  displayName: 'Daily Build'
+  branches:
+    include:
+      - master
+
+pool:
+    vmImage: 'windows-latest'
+
+variables:
+  BuildConfiguration: 'release'
+  InstallDirectory: 'D:\a\1\codeql-home'
+  OurWorkingDirectoryV2: 'D:/a/1/s'
+
+steps:
+- task: PowerShell@2
+  displayName: CodeQL Setup
+  inputs:
+    targetType: inline
+    script: |
+      cd "D:\a\1"
+     
+      Write-Host "DOWNLOADING CODEQL RUNNER"
+      New-Item -ItemType "directory" -Path $(InstallDirectory)
+      Invoke-WebRequest -uri https://github.com/github/codeql-action/releases/latest/download/codeql-runner-win.exe -OutFile $(InstallDirectory)\codeql-runner-win.exe
+
+- task: PowerShell@2
+  displayName: CodeQL Initialisation
+  inputs:
+    targetType: inline
+    script: |
+      Write-Host "INITIALIZING CODEQL"
+      & $(InstallDirectory)\codeql-runner-win.exe init --github-url https://github.com --repository cmboling/LocalNuGetFeed --github-auth $(MY_GITHUB_TOKEN) --languages csharp
+
+      Write-Host "SOURCE CODEQL ENVIRONMENT VARIABLES"
+      cat $(System.DefaultWorkingDirectory)\codeql-runner\codeql-env.sh | Invoke-Expression
+
+- task: PowerShell@2
+  displayName: CodeQL Autobuild
+  inputs:
+    targetType: inline
+    script: |
+      Write-Host "AUTOBUILDING CODEBASE"
+      & $(InstallDirectory)\codeql-runner-win.exe autobuild --language csharp
+
+# - task: DotNetCoreCLI@2
+#   displayName: 'Restore'
+#   inputs:
+#     command: 'restore'
+#     projects: '**/*.sln'
+
+# - task: DotNetCoreCLI@2
+#   displayName: 'Build'
+#   inputs:
+#     command: 'build'
+#     projects: '**/something.csproj'
+#     arguments: '--configuration $(BuildConfiguration) --no-restore'
+
+- task: PowerShell@2
+  displayName: CodeQL Analysis
+  inputs:
+    targetType: inline
+    script: |
+      Write-host "PERFORMING CODEQL ANALYSIS"
+      & $(InstallDirectory)/codeql-runner-win.exe analyze --github-url https://github.com --repository cmboling/LocalNugetFeed --github-auth $(MY_GITHUB_TOKEN) --commit $(Build.SourceVersion) --ref $(Build.SourceBranch)
