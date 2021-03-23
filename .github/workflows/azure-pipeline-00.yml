@@ -27,7 +27,8 @@ steps:
     targetType: inline
     script: |
       cd "D:\a\1"
-     
+      #$(System.DefaultWorkingDirectory) is D:\a\1\s
+
       Write-Host "DOWNLOADING CODEQL RUNNER"
       New-Item -ItemType "directory" -Path $(InstallDirectory)
       Invoke-WebRequest -uri https://github.com/github/codeql-action/releases/latest/download/codeql-runner-win.exe -OutFile $(InstallDirectory)\codeql-runner-win.exe
