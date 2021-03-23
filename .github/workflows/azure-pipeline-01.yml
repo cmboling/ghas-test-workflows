@@ -19,7 +19,6 @@ pool:
 variables:
   BuildConfiguration: 'release'
   InstallDirectory: 'D:\a\1\codeql-home'
-  OurWorkingDirectoryV2: 'D:/a/1/s'
 
 steps:
 - task: PowerShell@2
