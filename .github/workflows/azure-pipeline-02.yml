@@ -18,7 +18,6 @@ pool:
 
 variables:
   BuildConfiguration: 'release'
-  # InstallDirectory: 'D:\a\1\codeql-home'
   OurWorkingDirectoryV2: '/home/vsts/work/1'
 
 steps:
