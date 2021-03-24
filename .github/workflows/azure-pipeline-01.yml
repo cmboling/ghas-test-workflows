@@ -18,7 +18,7 @@ pool:
 
 variables:
   BuildConfiguration: 'release'
-  InstallDirectory: 'D:\a\1\codeql-home'
+  OurWorkingDirectoryV2: 'D:\a\1'
 
 steps:
 - task: PowerShell@2
@@ -27,9 +27,8 @@ steps:
     targetType: inline
     script: |     
       Write-Host "DOWNLOADING CODEQL WINDOWS BUNDLE"
-      New-Item -ItemType "directory" -Path $(InstallDirectory)
-      Invoke-WebRequest -uri https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-win64.tar.gz -OutFile $(InstallDirectory)\codeql-bundle-win64.tar.gz
-      cd $(InstallDirectory)
+      cd $(OurWorkingDirectoryV2)
+      Invoke-WebRequest -uri https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-win64.tar.gz -OutFile $(OurWorkingDirectoryV2)\codeql-bundle-win64.tar.gz
       tar zxf ./codeql-bundle-win64.tar.gz
 
 - task: PowerShell@2
@@ -38,7 +37,7 @@ steps:
     targetType: inline
     script: |
       Write-Host "CREATING CODEQL DATABASE"    
-      & $(InstallDirectory)\codeql\codeql database create $(System.DefaultWorkingDirectory)\codeql-database --language=csharp 
+      & $(OurWorkingDirectoryV2)\codeql\codeql database create $(OurWorkingDirectoryV2)\codeql-database --language=csharp 
       #dotnet restore **/*.sln
       #dotnet build **/something.csproj --configuration $(BuildConfiguration) --no-restore
 
@@ -48,10 +47,10 @@ steps:
     targetType: inline
     script: |
       Write-host "PERFORMING CODEQL ANALYSIS"
-      New-Item -ItemType "directory" -Path $(System.DefaultWorkingDirectory)\codeql-sarif
-      New-Item -ItemType "directory" -Path $(System.DefaultWorkingDirectory)\codeql-sarif\code-scanning-alerts.sarif
+      New-Item -ItemType "directory" -Path $(OurWorkingDirectoryV2)\codeql-sarif
+      New-Item -ItemType "directory" -Path $(OurWorkingDirectoryV2)\codeql-sarif\code-scanning-alerts.sarif
 
-      & $(InstallDirectory)\codeql\codeql database analyze $(System.DefaultWorkingDirectory)\codeql-database $(System.DefaultWorkingDirectory)\codeql\qlpacks\codeql-csharp\codeql-suites\csharp-code-scanning.qls --format=sarif-latest --output=$(System.DefaultWorkingDirectory)\codeql-sarif\code-scanning-alerts.sarif
+      & $(OurWorkingDirectoryV2)\codeql\codeql database analyze $(OurWorkingDirectoryV2)\codeql-database $(OurWorkingDirectoryV2)\codeql\qlpacks\codeql-csharp\codeql-suites\csharp-code-scanning.qls --format=sarif-latest --output=$(OurWorkingDirectoryV2)\codeql-sarif\code-scanning-alerts.sarif
       
 - task: PowerShell@2
   displayName: Upload CodeQL Results
@@ -59,4 +58,4 @@ steps:
     targetType: inline
     script: |
       Write-host "UPLOAD CODEQL RESULTS"      
-      & $(InstallDirectory)\codeql\codeql github upload-results --repository=cmboling/LocalNuGetFeed --ref=$(Build.SourceBranch) --commit=$(Build.SourceVersion) --sarif=$(System.DefaultWorkingDirectory)\codeql-sarif\code-scanning-alerts.sarif --github-auth-stdin=$(MY_GITHUB_TOKEN)
+      & $(OurWorkingDirectoryV2)\codeql\codeql github upload-results --repository=cmboling/LocalNuGetFeed --ref=$(Build.SourceBranch) --commit=$(Build.SourceVersion) --sarif=$(OurWorkingDirectoryV2)\codeql-sarif\code-scanning-alerts.sarif --github-auth-stdin=$(MY_GITHUB_TOKEN)
