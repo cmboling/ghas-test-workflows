@@ -36,6 +36,7 @@ steps:
     targetType: inline
     script: |
       $(OurWorkingDirectoryV2)/codeql/codeql database create $(OurWorkingDirectoryV2)/codeql-database --language=csharp
+
 - task: PowerShell@2
   displayName: CodeQL Analysis
   inputs:
@@ -43,6 +44,7 @@ steps:
     script: |
       mkdir $(OurWorkingDirectoryV2)/codeql-sarif && touch $(OurWorkingDirectoryV2)/codeql-sarif/code-scanning-alerts.sarif
       $(OurWorkingDirectoryV2)/codeql/codeql database analyze $(OurWorkingDirectoryV2)/codeql-database $(OurWorkingDirectoryV2)/codeql/qlpacks/codeql-csharp/codeql-suites/csharp-code-scanning.qls --format=sarif-latest --output=$(OurWorkingDirectoryV2)/codeql-sarif/code-scanning-alerts.sarif
+
 - task: PowerShell@2
   displayName: Upload CodeQL Results
   inputs:
