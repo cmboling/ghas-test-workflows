@@ -1,0 +1,53 @@
+trigger:
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - '*'
+
+schedules:
+- cron: "0 14 * * *" # 00:00 AEST is 14:00 UTC
+  displayName: 'Daily Build'
+  branches:
+    include:
+      - master
+
+pool:
+    vmImage: 'ubuntu-latest'
+
+variables:
+  BuildConfiguration: 'release'
+  # InstallDirectory: 'D:\a\1\codeql-home'
+  OurWorkingDirectoryV2: '/home/vsts/work/1'
+
+steps:
+- task: PowerShell@2
+  displayName: CodeQL Setup
+  inputs:
+    targetType: inline
+    script: |     
+      cd $(OurWorkingDirectoryV2)
+      wget -q https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+      tar xzf ./codeql-bundle-linux64.tar.gz
+
+- task: PowerShell@2
+  displayName: CodeQL Initialisation
+  inputs:
+    targetType: inline
+    script: |
+      $(OurWorkingDirectoryV2)/codeql/codeql database create $(OurWorkingDirectoryV2)/codeql-database --language=csharp
+- task: PowerShell@2
+  displayName: CodeQL Analysis
+  inputs:
+    targetType: inline
+    script: |
+      mkdir $(OurWorkingDirectoryV2)/codeql-sarif && touch $(OurWorkingDirectoryV2)/codeql-sarif/code-scanning-alerts.sarif
+      $(OurWorkingDirectoryV2)/codeql/codeql database analyze $(OurWorkingDirectoryV2)/codeql-database $(OurWorkingDirectoryV2)/codeql/qlpacks/codeql-csharp/codeql-suites/csharp-code-scanning.qls --format=sarif-latest --output=$(OurWorkingDirectoryV2)/codeql-sarif/code-scanning-alerts.sarif
+- task: PowerShell@2
+  displayName: Upload CodeQL Results
+  inputs:
+    targetType: inline
+    script: |
+      Write-host "UPLOAD CODEQL RESULTS"      
+      & $(OurWorkingDirectoryV2)/codeql/codeql github upload-results --repository=cmboling/LocalNuGetFeed --ref=$(Build.SourceBranch) --commit=$(Build.SourceVersion) --sarif=$(OurWorkingDirectoryV2)/codeql-sarif/code-scanning-alerts.sarif --github-auth-stdin=$(MY_GITHUB_TOKEN)
