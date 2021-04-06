@@ -13,14 +13,7 @@ RUN wget -q https://github.com/github/codeql-action/releases/latest/download/cod
 RUN tar xzf ./codeql-bundle-linux64.tar.gz
 
 # FETCH DEPENDENCIES AND CHECKOUT/COPY SRC
-COPY ["src/Api/Api.csproj", "src/Api/"]
-COPY ["NuGet.Config","NuGet.Config"]
 COPY . .
-
-ARG TCLogin
-ARG TCPassword
-
-RUN sed -i "s|</configuration>|<packageSourceCredentials><PeddleLocalThirdPartiesFeed><add key=\"Username\" value=\"${TCLogin}\" /><add key=\"ClearTextPassword\" value=\"${TCPassword}\" /></PeddleLocalThirdPartiesFeed><PeddleLocalFeed><add key=\"Username\" value=\"${TCLogin}\" /><add key=\"ClearTextPassword\" value=\"${TCPassword}\" /></PeddleLocalFeed><PeddleExtensionsConfiguration><add key=\"Username\" value=\"${TCLogin}\" /><add key=\"ClearTextPassword\" value=\"${TCPassword}\" /></PeddleExtensionsConfiguration><PeddleExtensionsConfigurationFeed><add key=\"Username\" value=\"${TCLogin}\" /><add key=\"ClearTextPassword\" value=\"${TCPassword}\" /></PeddleExtensionsConfigurationFeed></packageSourceCredentials></configuration>|" NuGet.Config
 
 # CREATE CODEQL DATABASE
 RUN /app/codeql/codeql database create /app/codeql-database --language=csharp --command="dotnet clean && dotnet restore --configfile \"./NuGet.Config" "src/Api/Api.csproj\" && dotnet build \"/app/src/Api/Api.csproj\" -c Release -o /app/build --no-restore"
