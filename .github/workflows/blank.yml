@@ -17,7 +17,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const query = `query($owner:String!, $name:String!, $label:String!) {
+            const query = `query($owner:String!, $name:String!) {
               repository(owner:$owner, name:$name){
                 issues(first:100, labels: [ "G: AdvSec", "bug" ]) {
                   nodes {
