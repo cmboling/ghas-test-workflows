@@ -19,7 +19,7 @@ jobs:
           script: |
             const query = `query($owner:String!, $name:String!, $label:String!) {
               repository(owner:$owner, name:$name){
-                issues(first:100, labels: ['G: AdvSec']) {
+                issues(first:100, labels: ["G: AdvSec"]) {
                   nodes {
                     id
                   }
