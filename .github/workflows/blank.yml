@@ -32,22 +32,14 @@ jobs:
               label: 'G: AdvSec'
             }
             const result = await github.graphql(query, variables)
-            console.log(result)
-            
+   
             if (!result) {
                core.setFailed('GraphQL request failed')
-             } else {
-               var pocs = [];
-               console.log(`POC Days per Issue:`)
-               for (const nodeNum in result.node.cards.nodes) {
-                 const node = result.node.cards.nodes[nodeNum]
-                 pocs.push({id:node.content.id, url: node.content.url })
-                 console.log(`${node.content.url}`)
-               }
-             return pocs 
-             }
-            
-            
+            } else {
+               console.log(JSON.stringify(result))
+            }
+            return result 
+
   comment:
     runs-on: ubuntu-latest
     steps:
