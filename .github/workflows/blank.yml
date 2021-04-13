@@ -1,13 +1,14 @@
 name: GHAS POC Reminders
-on:
-  schedule:
-    - cron: '0 0 * * *'
+
+# on:
+#   schedule:
+#     - cron: '0 0 * * *'
 
 # name: issue-checklist
 
-# on:
-#   issues:
-#     types: [opened]
+on:
+  issues:
+    types: [opened]
 
 jobs:
   comment:
