@@ -19,7 +19,7 @@ jobs:
           script: |
             const query = `query($owner:String!, $name:String!, $label:String!) {
               repository(owner:$owner, name:$name){
-                issues(first:100, labels: ["G: AdvSec"]) {
+                issues(first:100, labels: $label) {
                   nodes {
                     id
                   }
@@ -29,7 +29,7 @@ jobs:
             const variables = {
               owner: context.repo.owner,
               name: context.repo.repo //,
-              //label: 'wontfix'
+              label: [ "G: AdvSec" ]
             }
             const result = await github.graphql(query, variables)
             console.log(result)
