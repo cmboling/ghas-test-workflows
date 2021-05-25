@@ -37,7 +37,7 @@ steps:
     targetType: inline
     script: |
       Write-Host "CREATING CODEQL DATABASE"    
-      & $(OurWorkingDirectoryV2)\codeql\codeql database create $(OurWorkingDirectoryV2)\codeql-database --language=csharp 
+      & $(OurWorkingDirectoryV2)\codeql\codeql database create $(OurWorkingDirectoryV2)\codeql-database --language=csharp #--command=
       #dotnet restore **/*.sln
       #dotnet build **/something.csproj --configuration $(BuildConfiguration) --no-restore
 
