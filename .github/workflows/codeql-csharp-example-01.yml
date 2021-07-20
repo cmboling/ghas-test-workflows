@@ -1,0 +1,36 @@
+name: "CodeQL"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: windows-2016
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+        config-file: .github/codeql/codeql-config.yml
+
+    - if: matrix.language == 'csharp'
+      name: Build Project
+      run: |
+         cd "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\"
+         .\MSBuild.exe $Env:GITHUB_WORKSPACE\SomeSolution.sln /p:UseSharedCompilation=false 
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
